@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Clone the repository
-                git 'https://github.com/yourusername/your-repo.git'
+                git 'https://github.com/misschiomaa/javacalculator.git'
             }
         }
         stage('Build') {
