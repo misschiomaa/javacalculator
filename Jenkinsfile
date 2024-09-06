@@ -9,12 +9,14 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/misschiomaa/javacalculator.git'
             }
         }
-        // stage('Build') {
-        //     steps {
-        //         // Build the Java project using Maven
-        //         sh 'mvn clean compile'
-        //     }
-        // }
+        stage('Build') {
+            steps {
+                // Build the Java project using Maven
+                echo 'building my calculator'
+                sh 'cd javacalculator'
+                sh 'mvn clean compile'
+            }
+        }
         // stage('Test') {
         //     steps {
         //         // Run unit tests
