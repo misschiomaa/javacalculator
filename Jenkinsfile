@@ -4,32 +4,30 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Clone the repository
                 echo 'checking out branch'
                 git branch: 'main', url: 'https://github.com/misschiomaa/javacalculator.git'
             }
         }
         stage('Build') {
             steps {
-                // Build the Java project using Maven
                 echo 'building my calculator'
-                // sh 'pwd'
-                // sh 'ls -la'
                 sh 'mvn clean compile'
+                echo 'build step completed'
             }
         }
-        // stage('Test') {
-        //     steps {
-        //         // Run unit tests
-        //         sh 'mvn test'
-        //         }
-        //     post {
-        //         always {
-        //             // Publish JUnit test results
-        //             junit '**/target/surefire-reports/*.xml'
-        //         }
-        //     }
-        // }
+        stage('Test') {
+            steps {
+                echo 'starting unit testing'
+                sh 'mvn test'
+                echo 'test completed successfully'
+                }
+            post {
+                always {
+                    junit '**/target/calculator-reports/*.xml'
+                    echo 'test report publish successfully to /target/calculator-reports/'
+                }
+            }
+        }
         // stage('Package') {
         //     steps {
         //         // Package the application
