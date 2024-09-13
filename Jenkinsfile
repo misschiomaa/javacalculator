@@ -13,6 +13,8 @@ pipeline {
             steps {
                 // Build the Java project using Maven
                 echo 'building my calculator'
+                sh 'pwd'
+                sh 'ls -la'
                 sh 'cd javacalculator'
                 sh 'mvn clean compile'
             }
