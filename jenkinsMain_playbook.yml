@@ -1,0 +1,113 @@
+---
+- name: Set up Jenkins Server
+  hosts: jenkins_server
+  become: yes
+  vars:
+    jenkins_repo_url: http://pkg.jenkins.io/redhat-stable/jenkins.repo
+    jenkins_repo_key_url: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+    maven_version: 3.8.8  # Update to the desired Maven version
+    create_security_group: true
+
+  tasks:
+    - name: Ensure Python is installed (Amazon Linux 2 specific)
+      package:
+        name: python3
+        state: present
+      when: ansible_python_version is version('3', '<')
+
+    - name: Update the package manager cache (YUM)
+      yum:
+        update_cache: yes
+
+    - name: Install necessary packages
+      yum:
+        name:
+          - java-11-openjdk
+          - git
+          - wget
+          - unzip
+        state: present
+
+    - name: Add Jenkins repo file
+      get_url:
+        url: "{{ jenkins_repo_url }}"
+        dest: /etc/yum.repos.d/jenkins.repo
+        mode: '0644'
+
+    - name: Import Jenkins repository GPG keys
+      rpm_key:
+        state: present
+        key: "{{ jenkins_repo_key_url }}"
+
+    - name: Install Jenkins
+      yum:
+        name: jenkins
+        state: present
+
+    - name: Start and enable Jenkins service
+      systemd:
+        name: jenkins
+        state: started
+        enabled: yes
+
+    - name: Download Apache Maven
+      get_url:
+        url: "https://downloads.apache.org/maven/maven-3/{{ maven_version }}/binaries/apache-maven-{{ maven_version }}-bin.zip"
+        dest: "/tmp/apache-maven-{{ maven_version }}-bin.zip"
+
+    - name: Unzip Maven archive
+      unarchive:
+        src: "/tmp/apache-maven-{{ maven_version }}-bin.zip"
+        dest: /opt/
+        remote_src: yes
+        creates: "/opt/apache-maven-{{ maven_version }}"
+
+    - name: Create a symlink for Maven
+      file:
+        src: "/opt/apache-maven-{{ maven_version }}"
+        dest: /opt/maven
+        state: link
+
+    - name: Set Maven environment variables
+      blockinfile:
+        path: /etc/profile.d/maven.sh
+        create: yes
+        block: |
+          export M2_HOME=/opt/maven
+          export PATH=$M2_HOME/bin:$PATH
+        mode: '0755'
+
+    - name: Load Maven environment variables
+      shell: source /etc/profile.d/maven.sh
+      args:
+        executable: /bin/bash
+
+    - name: Display Jenkins Initial Admin Password
+      shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+      register: jenkins_admin_password
+
+    - name: Show Jenkins Initial Admin Password
+      debug:
+        msg: "Jenkins initial admin password is {{ jenkins_admin_password.stdout }}"
+
+    - name: Open port 8080 in the firewall (firewalld)
+      firewalld:
+        service: jenkins
+        permanent: yes
+        state: enabled
+        immediate: yes
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: Ensure port 8080 is open in security group (EC2 specific)
+      amazon.aws.ec2_group:
+        name: jenkins_sg
+        description: Security group for Jenkins
+        region: us-east-1
+        rules:
+          - proto: tcp
+            ports:
+              - 8080
+            cidr_ip: 0.0.0.0/0
+        state: present
+      delegate_to: localhost
+      when: create_security_group | default(false)
