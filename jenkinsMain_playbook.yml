@@ -82,6 +82,12 @@
       args:
         executable: /bin/bash
 
+    - name: Copy ssh key file to remote directory
+      copy:
+        src: ~/.ssh/jenkins.pem
+        dest: ~/.ssh/
+        mode: '0644
+
     - name: Display Jenkins Initial Admin Password
       shell: cat /var/lib/jenkins/secrets/initialAdminPassword
       register: jenkins_admin_password
