@@ -1,6 +1,6 @@
 ---
 - name: Set up Jenkins Server
-  hosts: jenkins_server
+  hosts: all
   become: yes
   vars:
     jenkins_repo_url: http://pkg.jenkins.io/redhat-stable/jenkins.repo
