@@ -96,18 +96,4 @@
         permanent: yes
         state: enabled
         immediate: yes
-      when: ansible_facts['os_family'] == 'RedHat'
-
-    - name: Ensure port 8080 is open in security group (EC2 specific)
-      amazon.aws.ec2_group:
-        name: jenkins_sg
-        description: Security group for Jenkins
-        region: us-east-1
-        rules:
-          - proto: tcp
-            ports:
-              - 8080
-            cidr_ip: 0.0.0.0/0
-        state: present
-      delegate_to: localhost
-      when: create_security_group | default(false)
+      when: ansible_facts['os_family'] == 'CentOS'
