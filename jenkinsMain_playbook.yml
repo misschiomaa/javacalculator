@@ -15,9 +15,9 @@
         state: present
       when: ansible_python_version is version('3', '<')
 
-    - name: Update the package manager cache (YUM)
-      yum:
-        update_cache: true
+    - name: Update the package manager cache (DNF)
+      dnf:
+        update_cache: yes
 
     - name: Install necessary packages
       yum:
