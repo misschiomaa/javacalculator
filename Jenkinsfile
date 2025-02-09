@@ -28,12 +28,12 @@ pipeline {
             //     }
             // }
         }
-        // stage('Package') {
-        //     steps {
-        //         // Package the application
-        //         sh 'mvn package'
-        //     }
-        // }
+        stage('Package') {
+            steps {
+                // Package the application
+                sh 'mvn package'
+            }
+        }
         // stage('Deploy') {
         //     steps {
         //         // Deploy the application (example for deploying to a server)
