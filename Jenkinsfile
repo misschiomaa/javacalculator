@@ -32,6 +32,7 @@ pipeline {
             steps {
                 // Package the application
                 sh 'mvn package'
+                echo 'package completed successfully'
             }
         }
         // stage('Deploy') {
