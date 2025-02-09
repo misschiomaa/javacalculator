@@ -21,12 +21,12 @@ pipeline {
                 sh 'mvn test'
                 echo 'test completed successfully'
                 }
-            post {
-                always {
-                    junit '**/target/calculator-reports/*.xml'
-                    echo 'test report publish successfully to /target/calculator-reports/'
-                }
-            }
+            // post {
+            //     always {
+            //         junit '**/target/calculator-reports/*.xml'
+            //         echo 'test report publish successfully to /target/calculator-reports/'
+            //     }
+            // }
         }
         // stage('Package') {
         //     steps {
@@ -46,7 +46,8 @@ pipeline {
     post {
         always {
             // Clean up workspace after build
-            cleanWs()
+            // cleanWs()
+            echo 'cleaning up workspace'
         }
     }
 }
