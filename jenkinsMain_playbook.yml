@@ -15,6 +15,22 @@
         state: present
       when: ansible_python_version is version('3', '<')
 
+      - name: Comment out mirrorlist lines in CentOS repo files
+      replace:
+        path: "{{ item }}"
+        regexp: '(^\s*)mirrorlist'
+        replace: '\1#mirrorlist'
+      with_fileglob:
+        - /etc/yum.repos.d/CentOS-*
+
+    - name: Change baseurl from mirror to vault in CentOS repo files
+      replace:
+        path: "{{ item }}"
+        regexp: '^#baseurl=http://mirror\.centos\.org'
+        replace: 'baseurl=http://vault.centos.org'
+      with_fileglob:
+        - /etc/yum.repos.d/CentOS-*
+
     - name: Update the package manager cache (YUM)
       yum:
         update_cache: yes
@@ -86,7 +102,7 @@
       copy:
         src: ~/.ssh/jenkins.pem
         dest: ~/.ssh/
-        mode: '0644
+        mode: '0644'
 
     - name: Display Jenkins Initial Admin Password
       shell: cat /var/lib/jenkins/secrets/initialAdminPassword
