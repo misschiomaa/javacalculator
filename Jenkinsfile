@@ -39,7 +39,11 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying WAR file to remote Tomcat server'
-                sh 'sudo scp -i /var/jenkins_home/.ssh/practicekey.pem -o StrictHostKeyChecking=no target/javaCalculator.war centos@ec2-18-212-175-1.compute-1.amazonaws.com:/opt/tomcat/webapps/'
+                // sh 'sudo scp -i /var/jenkins_home/.ssh/practicekey.pem -o StrictHostKeyChecking=no target/javaCalculator.war centos@ec2-18-212-175-1.compute-1.amazonaws.com:/opt/tomcat/webapps/'
+                sh '''
+                    scp -i /var/jenkins_home/.ssh/practicekey.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null target/javaCalculator.war centos@ec2-18-212-175-1.compute-1.amazonaws.com:/tmp/
+                    ssh -i /var/jenkins_home/.ssh/practicekey.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null centos@ec2-18-212-175-1.compute-1.amazonaws.com "sudo mv /tmp/javaCalculator.war /opt/tomcat/webapps/"
+                    '''
                 echo 'deployed calculator successfully'
             }
         }
