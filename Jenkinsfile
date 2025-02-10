@@ -33,7 +33,7 @@ pipeline {
                 // Package the application
                 sh 'mvn package'
                 echo 'package completed successfully'
-                sh 'ls'
+                sh 'ls target/' 
             }
         }
         stage('Deploy') {
