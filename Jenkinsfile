@@ -33,15 +33,16 @@ pipeline {
                 // Package the application
                 sh 'mvn package'
                 echo 'package completed successfully'
+                sh 'ls'
             }
         }
-        // stage('Deploy') {
-        //     steps {
-        //         // Deploy the application (example for deploying to a server)
-        //         // This step will vary based on your deployment target
-        //         sh 'scp target/myapp.jar user@your-server-ip:/path/to/deploy'
-        //     }
-        // }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying WAR file to remote Tomcat server'
+                sh 'scp -i /var/jenkins_home/.ssh/practicekey.pem -o StrictHostKeyChecking=no target/javacalculator.war centos@ec2-18-212-175-1.compute-1.amazonaws.com:/opt/tomcat/webapps/'
+                echo 'deployed calculator successfully'
+            }
+        }
     }
     
     post {
