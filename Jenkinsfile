@@ -31,7 +31,7 @@ pipeline {
         stage('Package') {
             steps {
                 // Package the application
-                sh 'mvn package'
+                sh 'mvn clean package'
                 echo 'package completed successfully'
                 sh 'ls target/' 
             }
